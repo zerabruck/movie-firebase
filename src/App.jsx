@@ -1,10 +1,11 @@
 // import { useContext, useEffect, useState } from 'react'
 import './App.css'
 import Auth from './components/Auth'
-import {getDocs, collection, addDoc, deleteDoc, doc, updateDoc} from "firebase/firestore"
+import {getDocs, collection, addDoc, deleteDoc, doc, updateDoc, setDoc} from "firebase/firestore"
 import { db, auth, storage } from './config/firebase'
 import {ref, uploadBytes} from "firebase/storage"
 import { useState, useEffect } from 'react'
+import ImageUpload from './components/ImageUpload'
 
 function App() {
   const [movies, setMovies] = useState([])
@@ -49,6 +50,16 @@ function App() {
     catch(err){
       console.error(err)
     }
+  }
+  const submitMovieWithCoustomId = async() =>{
+    await setDoc(doc(db, "movie", "my_id"),{
+      title:newMovieTitle,
+      dateofrelease:newMovieReleaseDate,
+      winoscar:haveOscar,
+      userId: auth?.currentUser?.uid || ""
+    })
+    getMovies()
+
   }
 
   const deleteMovie = async(movieId) =>{
@@ -112,11 +123,17 @@ function App() {
         <input type="checkbox" checked={haveOscar} onChange={e => setHaveOscar(e.target.checked)} />
         <label>Receved an oscar</label>
         <button onClick={submitMovie}>submit movie</button>
+        <button onClick={submitMovieWithCoustomId}>submit custom</button>
       </div>
 {/* upload file */}
       <div>
         <input type='file' onChange={(e) => setUploadFile(e.target.files[0])} />
         <button onClick={submitUpload}>upload file</button>
+      </div>
+
+      {/* image upload */}
+      <div>
+        <ImageUpload/>
       </div>
 
      </div>
